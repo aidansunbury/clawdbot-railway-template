@@ -28,7 +28,9 @@ RUN git clone --depth 1 --branch "${OPENCLAW_GIT_REF}" https://github.com/opencl
 RUN pnpm install --no-frozen-lockfile
 RUN pnpm build
 ENV OPENCLAW_PREFER_PNPM=1
-RUN pnpm ui:install && pnpm ui:build
+# `pnpm build` may leave a previous UI tree in dist; clear it before the UI
+# publisher swaps its staging output into place on Railway's build filesystem.
+RUN pnpm ui:install && rm -rf dist/control-ui && pnpm ui:build
 
 
 # Runtime image
